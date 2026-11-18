@@ -223,10 +223,10 @@ buildPoolSet() {
                 ctx.fillStyle = white; ctx.fillRect(-15, -2, 30, 4);
             }
             else if (id == 22) { //CLIMB 9-3
-                ctx.fillStyle = road; ctx.fillRect(-15, -67.5, 30, 135);
-                ctx.fillStyle = border; ctx.fillRect(-15, -67.5, 4, 135);
-                ctx.fillRect(11, -67.5, 4, 135); ctx.fillStyle = yellow;
-                ctx.fillRect(-11, -67.5, 4, 135); ctx.fillRect(7, -67.5, 4, 135);
+                ctx.fillStyle = road; ctx.fillRect(-15, -75, 30, 135);
+                ctx.fillStyle = border; ctx.fillRect(-15, -75, 4, 135);
+                ctx.fillRect(11, -75, 4, 135); ctx.fillStyle = yellow;
+                ctx.fillRect(-11, -75, 4, 135); ctx.fillRect(7, -75, 4, 135);
             }
             else if (id == 26) { //T-INTERSECTION
                 ctx.fillStyle = road; ctx.fillRect(-15, -15, 30, 30);
@@ -287,17 +287,17 @@ buildPoolSet() {
                 ctx.fillStyle = blue; ctx.fillRect(-11, -15, 4, 30);
             }
             else if (id == 33 || id == 35) { //SLOPE START ROAD LEFT BORDER, SLOPE END ROAD LEFT BORDER
-                ctx.fillStyle = roadPlatform; ctx.fillRect(-15, -22.5, 30, 45);
-                ctx.fillStyle = border; ctx.fillRect(-15, -22.5, 4, 45);
-                ctx.fillStyle = blue; ctx.fillRect(-11, -22.5, 4, 45);
+                ctx.fillStyle = roadPlatform; ctx.fillRect(-15, -30, 30, 45);
+                ctx.fillStyle = border; ctx.fillRect(-15, -30, 4, 45);
+                ctx.fillStyle = blue; ctx.fillRect(-11, -30, 4, 45);
             }
             else if (id == 36 || id == 38) { //SLOPE START ROAD CENTER, SLOPE END ROAD CENTER
-                ctx.fillStyle = roadPlatform; ctx.fillRect(-15, -22.5, 30, 45);
+                ctx.fillStyle = roadPlatform; ctx.fillRect(-15, -30, 30, 45);
             }
             else if (id == 39 || id == 41) { //SLOPE START ROAD RIGHT BORDER, SLOPE END RIGHT BORDER
-                ctx.fillStyle = roadPlatform; ctx.fillRect(-15, -22.5, 30, 45);
-                ctx.fillStyle = border; ctx.fillRect(11, -22.5, 4, 45);
-                ctx.fillStyle = blue; ctx.fillRect(7, -22.5, 4, 45);
+                ctx.fillStyle = roadPlatform; ctx.fillRect(-15, -30, 30, 45);
+                ctx.fillStyle = border; ctx.fillRect(11, -30, 4, 45);
+                ctx.fillStyle = blue; ctx.fillRect(7, -30, 4, 45);
             }
             else if (id == 40) { //ROAD RIGHT SLOPE BORDER
                 ctx.fillStyle = roadPlatform; ctx.fillRect(-15, -15, 30, 30);
