@@ -12,6 +12,10 @@
             this.trackPieces = [];
             this.ghosts = [];
             this.poolSet = new Set();
+            this.staticCanvas = document.createElement('canvas');
+            this.staticCanvas.width = 1500;
+            this.staticCanvas.height = 1500;
+            this.staticCtx = this.staticCanvas.getContext('2d');
         }
         sineWave(x, y, width, height, invert) {
             const ctx = this.ctx;
@@ -712,26 +716,31 @@ buildPoolSet() {
                 ctx.fillRect(-15, -15, 30, 30);
             }
         }
-        render(px, pz, pr) {
-            const ctx = this.ctx;
+        rebuildStaticLayer() {
+            const origCtx = this.ctx;
+            const ctx = this.staticCtx;
+            this.ctx = ctx;
             ctx.clearRect(0, 0, 1500, 1500);
-            if (!this.trackPieces || this.trackPieces.length === 0) return;
+            if (!this.trackPieces || this.trackPieces.length === 0) {
+                this.ctx = origCtx;
+                return;
+            }
             this.buildPoolSet();
             const sortedPieces = [...this.trackPieces].sort((a, b) => a.p[1] - b.p[1]);
             ctx.save();
-            ctx.translate(750, 750); 
+            ctx.translate(750, 750);
             sortedPieces.forEach(p => {
                 ctx.save();
-                ctx.translate(p.p[0], -p.p[2]); 
+                ctx.translate(p.p[0], -p.p[2]);
                 ctx.rotate((p.r || 0) * Math.PI / 180);
                 this.drawPieceAtOrigin(p);
                 ctx.restore();
-            }); 
+            });
             this.ghosts.forEach((ghost, index) => {
-                const colors = ["#00ffff", "#ffff00", "#ff00ff"]; 
+                const colors = ["#00ffff", "#ffff00", "#ff00ff"];
                 const color = colors[index % colors.length];
                 ctx.save();
-                ctx.shadowBlur = 20;
+                ctx.shadowBlur = 12;
                 ctx.shadowColor = color;
                 ctx.strokeStyle = color;
                 ctx.lineWidth = 6;
@@ -741,21 +750,24 @@ buildPoolSet() {
                 ctx.beginPath();
                 ghost.points.forEach((point, i) => {
                     const x = point.x;
-                    const z = -point.z; 
-                    if (i === 0) {
-                        ctx.moveTo(x, z);
-                    } else {
-                        ctx.lineTo(x, z);
-                    }
+                    const z = -point.z;
+                    if (i === 0) ctx.moveTo(x, z);
+                    else ctx.lineTo(x, z);
                 });
                 ctx.stroke();
                 ctx.restore();
             });
+            ctx.restore();
+            this.ctx = origCtx;
+        }
+        render(px, pz, pr) {
+            const ctx = this.ctx;
+            ctx.clearRect(0, 0, 1500, 1500);
+            if (!this.trackPieces || this.trackPieces.length === 0) return;
+            ctx.drawImage(this.staticCanvas, 0, 0);
             ctx.save();
-            ctx.translate(px, -pz);
+            ctx.translate(750 + px, 750 - pz);
             ctx.rotate((pr || 0) * Math.PI / 180);
-            ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
-            ctx.shadowBlur = 12;
             ctx.beginPath();
             ctx.arc(0, 0, 26, 0, Math.PI * 2);
             ctx.fillStyle = "rgba(255, 59, 48, 0.28)";
@@ -769,13 +781,12 @@ buildPoolSet() {
             ctx.lineJoin = "round";
             ctx.beginPath();
             ctx.moveTo(0, -28);
-            ctx.lineTo(20, 18); 
+            ctx.lineTo(20, 18);
             ctx.lineTo(0, 8);
             ctx.lineTo(-20, 18);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
-            ctx.restore();
             ctx.restore();
         }
     }
@@ -847,7 +858,7 @@ buildPoolSet() {
                 } else {
                     lastPos = { x: 0, z: 0, r: 0 };
                 }
-
+                mapInstance.rebuildStaticLayer();
                 mapInstance.render(lastPos.x, lastPos.z, lastPos.r); 
             }
         }
@@ -866,6 +877,7 @@ buildPoolSet() {
                 }
                 mapInstance.ghosts.sort((a, b) => a.finishTime - b.finishTime);
                 mapInstance.ghosts = mapInstance.ghosts.slice(0, 3);
+                mapInstance.rebuildStaticLayer();
                 mapInstance.render(lastPos.x, lastPos.z, lastPos.r); 
             }
         }
