@@ -12,11 +12,12 @@
         if (obj.isScene && !allScenes.has(obj)) {
             allScenes.add(obj);
             if (!gameScene) gameScene = obj;
-            console.log("[DashMap] Scene captured! Total scenes:", allScenes.size);
         }
         if (obj.isPerspectiveCamera && !gameCamera) {
             gameCamera = obj;
-            console.log("[DashMap] Camera captured!");
+        }
+        if (gameScene && gameCamera && Array.prototype.push !== origPush) {
+            Array.prototype.push = origPush;
         }
     };
     const origWeakSetAdd = WeakSet.prototype.add;
@@ -139,20 +140,23 @@
         const headingDeg = (Math.atan2(forwardX, forwardZ) * 180) / Math.PI;
         return { x: wx, z: -wz, r: Number.isFinite(headingDeg) ? headingDeg : 0 };
     }
-    function updateLoop() {
-        const transform = getThreePlayerTransform();
-        if (transform) {
-            window.postMessage({
-                type: 'UPDATE_POS',
-                x: transform.x,
-                z: transform.z,
-                r: transform.r
-            }, "*");
+    let lastSendTime = 0;
+    function updateLoop(now) {
+        if (now - lastSendTime >= 33) {
+            lastSendTime = now;
+            const transform = getThreePlayerTransform();
+            if (transform) {
+                window.postMessage({
+                    type: 'UPDATE_POS',
+                    x: transform.x,
+                    z: transform.z,
+                    r: transform.r
+                }, "*");
+            }
         }
         requestAnimationFrame(updateLoop);
     }
     requestAnimationFrame(updateLoop);
-
     window.addEventListener("message", (e) => {
         if (e.data.type === 'READY' && cachedTrackData) {
             window.postMessage({ type: 'TRACK_DATA', data: cachedTrackData }, "*");
