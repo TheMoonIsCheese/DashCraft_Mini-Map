@@ -3,7 +3,6 @@
     let isRaceActive = false;
     let ghostTrails = [];
     let isManuallyClosed = false;
-
     class DashMinimap {
         constructor(canvEl) {
             this.ctx = canvEl.getContext('2d');
@@ -27,7 +26,6 @@
                 }
             }
         }
-
 buildPoolSet() {
             this.poolSet.clear();
             for (const p of this.trackPieces) {
@@ -36,18 +34,14 @@ buildPoolSet() {
                 }
             }
         }
-
         drawPoolPiece(p, isRounded) {
             const ctx = this.ctx;
             const [x, y, z] = p.p;
-            const step = 30; // 2x2 pool center-to-center distance in JSON units (2 * 15)
-
-            // Check neighbors in world space, then rotate neighbor flags into local piece space
+            const step = 30;
             const worldN = this.poolSet.has(`${Math.round(x)},${Math.round(y)},${Math.round(z + step)}`);
             const worldS = this.poolSet.has(`${Math.round(x)},${Math.round(y)},${Math.round(z - step)}`);
             const worldW = this.poolSet.has(`${Math.round(x - step)},${Math.round(y)},${Math.round(z)}`);
             const worldE = this.poolSet.has(`${Math.round(x + step)},${Math.round(y)},${Math.round(z)}`);
-
             const rot = (((p.r || 0) % 360) + 360) % 360;
             let hasTop = worldN, hasRight = worldE, hasBottom = worldS, hasLeft = worldW;
             if (rot === 90) {
@@ -57,32 +51,25 @@ buildPoolSet() {
             } else if (rot === 270) {
                 hasTop = worldE; hasRight = worldS; hasBottom = worldW; hasLeft = worldN;
             }
-
-            const size = 30; // 2x2 = 30px in JSON units
+            const size = 30;
             const half = 15;
             const r = isRounded ? 6 : 0;
-
             const radii = [
                 (!hasTop && !hasLeft) ? r : 0,
                 (!hasTop && !hasRight) ? r : 0,
                 (!hasBottom && !hasRight) ? r : 0,
                 (!hasBottom && !hasLeft) ? r : 0
             ];
-
-            // White outer border
             ctx.fillStyle = "#ffffff";
             ctx.beginPath();
             ctx.roundRect(-half, -half, size, size, radii);
             ctx.fill();
-
-            // Blue water center (flush on edges touching another pool)
             const b = 3;
             const insetL = hasLeft ? 0 : b;
             const insetR = hasRight ? 0 : b;
             const insetT = hasTop ? 0 : b;
             const insetB = hasBottom ? 0 : b;
             const innerRadii = radii.map(rad => Math.max(0, rad - 2));
-
             ctx.fillStyle = "#22a1e3";
             ctx.beginPath();
             ctx.roundRect(
@@ -94,7 +81,6 @@ buildPoolSet() {
             );
             ctx.fill();
         }
-
         drawPieceAtOrigin(p) {
             const ctx = this.ctx;
             const id = p.id;
@@ -725,24 +711,19 @@ buildPoolSet() {
                 ctx.beginPath(); ctx.arc(-60, -60, 96, 0, Math.PI / 2); ctx.stroke();
                 ctx.beginPath(); ctx.arc(-60, -60, 114, 0, Math.PI / 2); ctx.stroke();
             }
-            else { //FALLBACK DEFAULT SQUARE
+            else { //FALLBACK
                 ctx.fillStyle = road;
                 ctx.fillRect(-15, -15, 30, 30);
             }
         }
-
         render(px, pz, pr) {
             const ctx = this.ctx;
             ctx.clearRect(0, 0, 1500, 1500);
-            
             if (!this.trackPieces || this.trackPieces.length === 0) return;
-        
             this.buildPoolSet();
             const sortedPieces = [...this.trackPieces].sort((a, b) => a.p[1] - b.p[1]);
-        
             ctx.save();
             ctx.translate(750, 750); 
-        
             sortedPieces.forEach(p => {
                 ctx.save();
                 ctx.translate(p.p[0], -p.p[2]); 
@@ -750,13 +731,10 @@ buildPoolSet() {
                 this.drawPieceAtOrigin(p);
                 ctx.restore();
             }); 
-
             this.ghosts.forEach((ghost, index) => {
-                const colors = ["#00ffff", "#ff00ff", "#ffff00"]; 
+                const colors = ["#00ffff", "#ffff00", "#ff00ff"]; 
                 const color = colors[index % colors.length];
-            
                 ctx.save();
-                
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = color;
                 ctx.strokeStyle = color;
@@ -764,7 +742,6 @@ buildPoolSet() {
                 ctx.lineCap = "round";
                 ctx.lineJoin = "round";
                 ctx.globalAlpha = 0.8;
-            
                 ctx.beginPath();
                 ghost.points.forEach((point, i) => {
                     const x = point.x;
@@ -776,7 +753,6 @@ buildPoolSet() {
                     }
                 });
                 ctx.stroke();
-            
                 ctx.restore();
             });
             ctx.save();
@@ -784,7 +760,6 @@ buildPoolSet() {
             ctx.rotate((pr || 0) * Math.PI / 180);
             ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
             ctx.shadowBlur = 12;
-
             ctx.beginPath();
             ctx.arc(0, 0, 26, 0, Math.PI * 2);
             ctx.fillStyle = "rgba(255, 59, 48, 0.28)";
@@ -796,7 +771,6 @@ buildPoolSet() {
             ctx.strokeStyle = "#ffffff";
             ctx.lineWidth = 4;
             ctx.lineJoin = "round";
-
             ctx.beginPath();
             ctx.moveTo(0, -28);
             ctx.lineTo(20, 18); 
@@ -805,16 +779,13 @@ buildPoolSet() {
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
-
             ctx.restore();
             ctx.restore();
         }
     }
-
     const ensureUI = () => {
         let container = document.getElementById('dashmap-container');
         let canvas = document.getElementById('dashmap-canvas');
-    
         if (!container) {
             container = document.createElement('div');
             container.id = 'dashmap-container';
@@ -824,14 +795,12 @@ buildPoolSet() {
                 background: 'rgba(0, 0, 0, 0.7)', borderRadius: '15px',
                 border: '2px solid white', overflow: 'hidden'
             });
-    
             canvas = document.createElement('canvas');
             canvas.id = 'dashmap-canvas';
             canvas.width = 1500; canvas.height = 1500;
             Object.assign(canvas.style, {
                 width: '100%', height: '100%', pointerEvents: 'none'
             });
-    
             const closeBtn = document.createElement('div');
             closeBtn.innerText = '✕';
             Object.assign(closeBtn.style, {
@@ -839,26 +808,21 @@ buildPoolSet() {
                 color: 'white', cursor: 'pointer', fontSize: '20px',
                 fontWeight: 'bold', zIndex: '2147483648', pointerEvents: 'auto'
             });
-    
             closeBtn.onclick = () => {
                 isManuallyClosed = true;
                 container.style.display = 'none';
             };
-    
             container.appendChild(closeBtn);
             container.appendChild(canvas);
             document.body.appendChild(container);
             mapInstance = new DashMinimap(canvas);
         }
-    
         container.style.display = (isRaceActive && !isManuallyClosed) ? 'block' : 'none';
     };
-
     let readyInterval = null;
     let lastPos = { x: 0, z: 0, r: 0 };
-
     window.addEventListener("message", (e) => {
-        if (e.data.type === 'DASH_TRACK_DATA') {
+        if (e.data.type === 'TRACK_DATA') {
             isRaceActive = true;
             isManuallyClosed = false;
             ensureUI();
@@ -891,35 +855,39 @@ buildPoolSet() {
                 mapInstance.render(lastPos.x, lastPos.z, lastPos.r); 
             }
         }
-    
-        if (e.data.type === 'DASH_ADD_GHOST') {
+        if (e.data.type === 'ADD_GHOST') {
             if (mapInstance) {
-                mapInstance.ghosts.push({
-                    username: e.data.username,
-                    points: e.data.points
-                });
+                const existing = mapInstance.ghosts.find(g => g.username === e.data.username);
+                if (existing) {
+                    existing.points = e.data.points;
+                    existing.finishTime = e.data.finishTime ?? existing.finishTime;
+                } else {
+                    mapInstance.ghosts.push({
+                        username: e.data.username,
+                        finishTime: e.data.finishTime ?? Infinity,
+                        points: e.data.points
+                    });
+                }
+                mapInstance.ghosts.sort((a, b) => a.finishTime - b.finishTime);
+                mapInstance.ghosts = mapInstance.ghosts.slice(0, 3);
                 mapInstance.render(lastPos.x, lastPos.z, lastPos.r); 
             }
         }
-
-        if (e.data.type === 'DASH_UPDATE_POS') {
+        if (e.data.type === 'UPDATE_POS') {
             lastPos = { x: e.data.x, z: e.data.z, r: e.data.r };
             if (mapInstance && isRaceActive && !isManuallyClosed) {
                 mapInstance.render(lastPos.x, lastPos.z, lastPos.r);
             }
         }
     });
-
     readyInterval = setInterval(() => {
         if (!isRaceActive) {
-            window.postMessage({ type: 'DASH_READY' }, "*");
+            window.postMessage({ type: 'READY' }, "*");
         }
     }, 1000);
-
     setInterval(() => {
         ensureUI();
         if (isRaceActive && !isManuallyClosed && mapInstance) {
-            // Re-render using the player's last known position instead of (0, 0, 0)
             mapInstance.render(lastPos.x, lastPos.z, lastPos.r);
         }
     }, 1000);
