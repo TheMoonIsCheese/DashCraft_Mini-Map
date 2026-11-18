@@ -1,6 +1,7 @@
 (function() {
     const orgFetch = window.fetch;
     let cachedTrackData = null;
+    let topGhostUserIds = new Set();
     const allScenes = new Set();
     let gameScene = null;
     let gameCamera = null;
@@ -54,12 +55,30 @@
         const url = typeof args[0] === "string" ? args[0] : (args[0]?.url || "");
         const contentType = res.headers.get("content-type") || "";
 
-        if (contentType.includes("application/json") || url.includes("track")) {
+        if (contentType.includes("application/json") || url.includes("track") || url.includes("/ghost/") || url.includes("leaderboard")) {
             res.clone().json().then(data => {
                 if (data && Array.isArray(data.trackPieces)) {
                     cachedTrackData = data;
                     playerCar = null;
-                    window.postMessage({ type: 'DASH_TRACK_DATA', data }, "*");
+                    topGhostUserIds.clear();
+                    window.postMessage({ type: 'TRACK_DATA', data }, "*");
+                } 
+                else if (Array.isArray(data) && data.length > 0 && data[0]?.userId && typeof data[0]?.time === "number") {
+                    topGhostUserIds = new Set(data.slice(0, 3).map(entry => entry.userId));
+                }
+                else if (data && Array.isArray(data.snapshots)) {
+                    if (topGhostUserIds.size > 0 && !topGhostUserIds.has(data.userId)) {
+                        return;
+                    }
+                    const points = data.snapshots
+                        .filter(s => Array.isArray(s.p))
+                        .map(s => ({ x: s.p[0], z: s.p[2] }));
+                    window.postMessage({
+                        type: 'ADD_GHOST',
+                        username: data.userId || url,
+                        finishTime: typeof data.finishTime === "number" ? data.finishTime : Infinity,
+                        points
+                    }, "*");
                 }
             }).catch(() => {});
         }
@@ -104,8 +123,6 @@
 
         return movingCandidate;
     }
-
-    // 4. Extract World Position & Heading
     function getThreePlayerTransform() {
         if (!playerCar || !playerCar.parent) {
             playerCar = findPlayerCar();
@@ -127,7 +144,7 @@
         const transform = getThreePlayerTransform();
         if (transform) {
             window.postMessage({
-                type: 'DASH_UPDATE_POS',
+                type: 'UPDATE_POS',
                 x: transform.x,
                 z: transform.z,
                 r: transform.r
@@ -138,8 +155,8 @@
     requestAnimationFrame(updateLoop);
 
     window.addEventListener("message", (e) => {
-        if (e.data.type === 'DASH_READY' && cachedTrackData) {
-            window.postMessage({ type: 'DASH_TRACK_DATA', data: cachedTrackData }, "*");
+        if (e.data.type === 'READY' && cachedTrackData) {
+            window.postMessage({ type: 'TRACK_DATA', data: cachedTrackData }, "*");
         }
     });
 
