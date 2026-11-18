@@ -7,7 +7,7 @@ Real-Time Track Rendering: Automatically reads track data on load and renders an
 
 Live Player Tracker: Tracks your vehicle's live position and rotation in real time.
 
-Ghost Trail Display: Currently not working as there is no endpoint for storing ghosts in the remake yet.
+Ghost Trail Display: Currently not working in remake as there is no endpoint for storing ghosts in the remake yet.
 
 High-Contrast Visuals: Color-coded track surfaces, platform trims, and high-visibility player markers so you can read upcoming turns at a glance.
 
