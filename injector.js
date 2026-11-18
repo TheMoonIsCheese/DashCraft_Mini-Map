@@ -1,17 +1,17 @@
 (function() {
     const orgFetch = window.fetch;
     let cachedTrackData = null;
+    const allScenes = new Set();
     let gameScene = null;
     let gameCamera = null;
     let playerCar = null;
     const prevPositions = new WeakMap();
-
-    // 1. Capture Three.js Scene & Camera
     const captureThreeObject = (obj) => {
         if (!obj || typeof obj !== 'object') return;
-        if (obj.isScene && !gameScene) {
-            gameScene = obj;
-            console.log("[DashMap] Scene captured!");
+        if (obj.isScene && !allScenes.has(obj)) {
+            allScenes.add(obj);
+            if (!gameScene) gameScene = obj;
+            console.log("[DashMap] Scene captured! Total scenes:", allScenes.size);
         }
         if (obj.isPerspectiveCamera && !gameCamera) {
             gameCamera = obj;
@@ -49,7 +49,6 @@
         return origPush.apply(this, items);
     };
 
-    // 2. Intercept Track Data
     window.fetch = async (...args) => {
         const res = await orgFetch(...args);
         const url = typeof args[0] === "string" ? args[0] : (args[0]?.url || "");
@@ -67,41 +66,41 @@
         return res;
     };
 
-    // 3. Find the moving Player Car directly inside gameScene (without needing gameCamera)
-    function findPlayerCar() {
-        if (!gameScene) return null;
+   function findPlayerCar() {
+        if (allScenes.size === 0) return null;
 
         let movingCandidate = null;
-        let maxMoved = 0.002; // Minimum movement threshold per frame
+        let maxMoved = 0.002;
 
-        gameScene.traverse((obj) => {
-            if (!obj.parent || obj.isScene || obj.isCamera || obj.isLight) return;
+        for (const scene of allScenes) {
+            scene.traverse((obj) => {
+                if (!obj.parent || obj.isScene || obj.isCamera || obj.isLight) return;
 
-            const e = obj.matrixWorld.elements;
-            const wx = e[12], wy = e[13], wz = e[14];
+                const e = obj.matrixWorld.elements;
+                const wx = e[12], wy = e[13], wz = e[14];
 
-            const prev = prevPositions.get(obj);
-            prevPositions.set(obj, { x: wx, y: wy, z: wz });
+                const prev = prevPositions.get(obj);
+                prevPositions.set(obj, { x: wx, y: wy, z: wz });
 
-            if (!prev) return;
-            const moved = Math.hypot(wx - prev.x, wy - prev.y, wz - prev.z);
+                if (!prev) return;
+                const moved = Math.hypot(wx - prev.x, wy - prev.y, wz - prev.z);
 
-            // Pick the primary moving object (and walk up to its top-level chassis group)
-            if (moved > maxMoved) {
-                let rootObj = obj;
-                while (rootObj.parent && rootObj.parent !== gameScene) {
-                    // Stop walking up if the parent is a static container at (0,0,0) with many children
-                    if (rootObj.parent.children.length > 5 &&
-                        rootObj.parent.position.x === 0 &&
-                        rootObj.parent.position.z === 0) {
-                        break;
+                if (moved > maxMoved) {
+                    let rootObj = obj;
+                    while (rootObj.parent && rootObj.parent !== scene) {
+                        if (rootObj.parent.children.length > 5 &&
+                            rootObj.parent.position.x === 0 &&
+                            rootObj.parent.position.z === 0) {
+                            break;
+                        }
+                        rootObj = rootObj.parent;
                     }
-                    rootObj = rootObj.parent;
+                    maxMoved = moved;
+                    movingCandidate = rootObj;
+                    gameScene = scene;
                 }
-                maxMoved = moved;
-                movingCandidate = rootObj;
-            }
-        });
+            });
+        }
 
         return movingCandidate;
     }
