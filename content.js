@@ -13,7 +13,6 @@
             this.ghosts = [];
             this.poolSet = new Set();
         }
-
         sineWave(x, y, width, height, invert) {
             const ctx = this.ctx;
             ctx.moveTo(x, y);
@@ -84,14 +83,11 @@ buildPoolSet() {
         drawPieceAtOrigin(p) {
             const ctx = this.ctx;
             const id = p.id;
-        
             const road = "#a5a5a5", yellow = "#ffcf00", finish = "#ef3533", border = "#363636";
             const blue = "#22a1e3", white = "#ffffff", platformEdge = "#555555", roadPlatform = "#808080";
             const tube = "#4facfe", lightgrass = "#7cfc00", darkgrass = "#228b22", tree = "#2d5a27";
             const ice = "#d8ffff", dirt = "#b57a49";
-        
             ctx.lineWidth = 1;
-        
             if (id == 1) { //START
                 ctx.fillStyle = road;
                 ctx.fillRect(-15, -15, 30, 30);
@@ -874,9 +870,11 @@ buildPoolSet() {
             }
         }
         if (e.data.type === 'UPDATE_POS') {
-            lastPos = { x: e.data.x, z: e.data.z, r: e.data.r };
-            if (mapInstance && isRaceActive && !isManuallyClosed) {
-                mapInstance.render(lastPos.x, lastPos.z, lastPos.r);
+            if (Number.isFinite(e.data.x) && Number.isFinite(e.data.z)) {
+                lastPos = { x: e.data.x, z: e.data.z, r: Number.isFinite(e.data.r) ? e.data.r : lastPos.r };
+                if (mapInstance && isRaceActive && !isManuallyClosed) {
+                    mapInstance.render(lastPos.x, lastPos.z, lastPos.r);
+                }
             }
         }
     });
