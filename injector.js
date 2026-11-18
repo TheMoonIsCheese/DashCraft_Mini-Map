@@ -19,19 +19,16 @@
             console.log("[DashMap] Camera captured!");
         }
     };
-
     const origWeakSetAdd = WeakSet.prototype.add;
     WeakSet.prototype.add = function(value) {
         captureThreeObject(value);
         return origWeakSetAdd.apply(this, arguments);
     };
-
     const origWeakMapSet = WeakMap.prototype.set;
     WeakMap.prototype.set = function(key, value) {
         captureThreeObject(key);
         return origWeakMapSet.apply(this, arguments);
     };
-
     const origPush = Array.prototype.push;
     Array.prototype.push = function(...items) {
         if (!gameScene || !gameCamera) {
@@ -49,12 +46,10 @@
         }
         return origPush.apply(this, items);
     };
-
     window.fetch = async (...args) => {
         const res = await orgFetch(...args);
         const url = typeof args[0] === "string" ? args[0] : (args[0]?.url || "");
         const contentType = res.headers.get("content-type") || "";
-
         if (contentType.includes("application/json") || url.includes("track") || url.includes("/ghost/") || url.includes("leaderboard")) {
             res.clone().json().then(data => {
                 if (data && Array.isArray(data.trackPieces)) {
@@ -84,61 +79,65 @@
         }
         return res;
     };
-
-   function findPlayerCar() {
+    function findPlayerCar() {
         if (allScenes.size === 0) return null;
-
-        let movingCandidate = null;
-        let maxMoved = 0.002;
-
+        let camX = null, camY = null, camZ = null;
+        if (gameCamera) {
+            const ce = gameCamera.matrixWorld.elements;
+            camX = ce[12];
+            camY = ce[13];
+            camZ = ce[14];
+        }
+        let bestCandidate = null;
+        let bestScore = Infinity;
         for (const scene of allScenes) {
             scene.traverse((obj) => {
-                if (!obj.parent || obj.isScene || obj.isCamera || obj.isLight) return;
-
+                if (!obj.parent || obj.isScene || obj.isCamera || obj.isLight || !obj.visible) return;
+                if (typeof obj.name === 'string' && obj.name.startsWith('environment_')) return;
                 const e = obj.matrixWorld.elements;
                 const wx = e[12], wy = e[13], wz = e[14];
-
+                if (!Number.isFinite(wx) || !Number.isFinite(wz)) return;
                 const prev = prevPositions.get(obj);
                 prevPositions.set(obj, { x: wx, y: wy, z: wz });
-
                 if (!prev) return;
                 const moved = Math.hypot(wx - prev.x, wy - prev.y, wz - prev.z);
-
-                if (moved > maxMoved) {
+                if (moved > 0.002) {
                     let rootObj = obj;
                     while (rootObj.parent && rootObj.parent !== scene) {
-                        if (rootObj.parent.children.length > 5 &&
-                            rootObj.parent.position.x === 0 &&
-                            rootObj.parent.position.z === 0) {
-                            break;
+                        if (typeof rootObj.parent.name === 'string' && rootObj.parent.name.startsWith('environment_')) {
+                            return;
                         }
+                        const pe = rootObj.parent.matrixWorld.elements;
+                        if (Math.hypot(pe[12] - wx, pe[14] - wz) > 2.0) break;
                         rootObj = rootObj.parent;
                     }
-                    maxMoved = moved;
-                    movingCandidate = rootObj;
-                    gameScene = scene;
+                    const distToCam = (camX !== null && (camX !== 0 || camZ !== 0))
+                        ? Math.hypot(wx - camX, wy - camY, wz - camZ)
+                        : (1 / moved);
+                    if (distToCam < bestScore) {
+                        bestScore = distToCam;
+                        bestCandidate = rootObj;
+                        gameScene = scene;
+                    }
                 }
             });
         }
-
-        return movingCandidate;
+        return bestCandidate;
     }
     function getThreePlayerTransform() {
-        if (!playerCar || !playerCar.parent) {
+        if (!playerCar || !playerCar.parent || !playerCar.visible) {
             playerCar = findPlayerCar();
         }
         const target = playerCar;
         if (!target) return null;
-
         const e = target.matrixWorld.elements;
         const wx = e[12];
         const wz = e[14];
-
+        if (!Number.isFinite(wx) || !Number.isFinite(wz)) return null;
         const forwardX = -e[8];
         const forwardZ = e[10];
         const headingDeg = (Math.atan2(forwardX, forwardZ) * 180) / Math.PI;
-
-        return { x: wx, z: -wz, r: headingDeg };
+        return { x: wx, z: -wz, r: Number.isFinite(headingDeg) ? headingDeg : 0 };
     }
     function updateLoop() {
         const transform = getThreePlayerTransform();
@@ -159,7 +158,6 @@
             window.postMessage({ type: 'TRACK_DATA', data: cachedTrackData }, "*");
         }
     });
-
     window.__DASH_DEBUG__ = () => ({
         gameScene,
         childrenSummary: gameScene?.children.map((c, i) => ({
