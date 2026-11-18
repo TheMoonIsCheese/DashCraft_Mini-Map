@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "DashMap",
+  "name": "DashCraft Mini-Map",
   "version": "1.0",
   "icons": {
     "16": "icons/icon16.png",
