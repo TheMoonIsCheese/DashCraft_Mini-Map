@@ -2,6 +2,7 @@
     let mapInstance = null;
     let isRaceActive = false;
     let ghostTrails = [];
+    let pendingRaceStart = false;
     let isManuallyClosed = false;
     class DashMinimap {
         constructor(canvEl) {
@@ -89,7 +90,7 @@ buildPoolSet() {
             const id = p.id;
             const road = "#a5a5a5", yellow = "#ffcf00", finish = "#ef3533", border = "#363636";
             const blue = "#22a1e3", white = "#ffffff", platformEdge = "#555555", roadPlatform = "#808080";
-            const tube = "#4facfe", lightgrass = "#7cfc00", darkgrass = "#228b22", tree = "#2d5a27";
+            const tube = "#4facfe", lightgrass = "#42ab42", darkgrass = "#228b22", tree = "#2d5a27";
             const ice = "#d8ffff", dirt = "#b57a49";
             ctx.lineWidth = 1;
             if (id == 1) { //START
@@ -178,20 +179,30 @@ buildPoolSet() {
                 ctx.strokeStyle = road; ctx.beginPath();
                 ctx.arc(15, -15, 30, Math.PI / 2, Math.PI); ctx.stroke();
             }
-            else if (id == 11 || id == 9 || id == 149 || id == 13 || id == 14) { //CURVE 3, CURVE 1, GRASS RAMP BIG, HORIZONTAL METAL, SLOPE METAL
-                ctx.fillStyle = road; ctx.fillRect(-15, -15, 30, 30);
-                ctx.fillStyle = platformEdge; ctx.fillRect(-15, -15, 4, 30);
-                ctx.fillRect(11, -15, 4, 30); ctx.fillRect(-15, 11, 30, 4);
-                ctx.fillStyle = yellow; ctx.fillRect(-15, -15, 30, 1); ctx.fillRect(14, -15, 1, 30); ctx.fillRect(-15, 14, 30, 1);
+            else if (id == 13 || id == 14) { //HORIZONTAL METAL, METAL SLOPE
+                ctx.fillStyle = road;
+                ctx.fillRect(-15, -15, 30, 30);
+                ctx.fillStyle = roadPlatform;
+                ctx.fillRect(-11, -11, 22, 22);
+                ctx.fillStyle = yellow;
+                ctx.fillRect(-15, -15, 30, 1); 
+                ctx.fillRect(-15, 14, 30, 1); 
+                ctx.fillRect(-15, -15, 1, 30); 
+                ctx.fillRect(14, -15, 1, 30);
             }
             else if (id == 12 || id == 71) { //VERTICAL METAL, VERTICAL SHORT 1 METAL
                 ctx.fillStyle = road; ctx.fillRect(-15, -2, 30, 4);
             }
             else if (id == 15 || id == 16) { //SLOPE START METAL, SLOPE END METAL
-                ctx.fillStyle = road; ctx.fillRect(-15, -15, 30, 45);
-                ctx.fillStyle = platformEdge; ctx.fillRect(-15, -15, 4, 45);
-                ctx.fillRect(11, -15, 4, 45); ctx.fillRect(-15, -15, 30, 4);
-                ctx.fillRect(-15, 11, 30, 4); ctx.fillStyle = yellow;
+                ctx.fillStyle = road;
+                ctx.fillRect(-15, -15, 30, 45);
+                ctx.fillStyle = roadPlatform;
+                ctx.fillRect(-11, -11, 22, 37);
+                ctx.fillStyle = yellow;
+                ctx.fillRect(-15, -15, 30, 1);
+                ctx.fillRect(-15, 29, 30, 1);
+                ctx.fillRect(-15, -15, 1, 45);
+                ctx.fillRect(14, -15, 1, 45);
             }
             else if (id == 17 || id == 23 || id == 25) { //SLOPE 3-1, SLOPE START, SLOPE END
                 ctx.fillStyle = road; ctx.fillRect(-15, -30, 30, 45);
@@ -366,13 +377,140 @@ buildPoolSet() {
                 ctx.strokeStyle = yellow; ctx.beginPath(); this.sineWave(-39, -45, 60, 90, false); ctx.stroke();
                 ctx.beginPath(); this.sineWave(-21, -45, 60, 90, false); ctx.stroke();
             }
-            else if (id == 70 || id == 43 || id == 104 || id == 106) { //HORIZONTAL SHORT METAL, GRASS RAMP, CURVE 1 1X1, CURVE 3 1X1
-                ctx.fillStyle = road; ctx.fillRect(-15, -15, 30, 15);
-                ctx.fillStyle = platformEdge; ctx.fillRect(-15, -15, 4, 15);
-                ctx.fillRect(11, -15, 4, 15); ctx.fillRect(-15, -15, 30, 4);
-                ctx.fillRect(-15, -4, 30, 4); ctx.fillStyle = yellow;
-                ctx.fillRect(-15, -15, 1, 15); ctx.fillRect(14, -15, 1, 15);
-                ctx.fillRect(-15, -15, 30, 1); ctx.fillRect(-15, -1, 30, 1);
+            else if (id == 70) { //HORIZONTAL SHORT METAL
+                ctx.fillStyle = road;
+                ctx.fillRect(-15, -15, 30, 15);
+                ctx.fillStyle = roadPlatform;
+                ctx.fillRect(-11, -11, 22, 7);
+                ctx.fillStyle = yellow;
+                ctx.fillRect(-15, -15, 30, 1);
+                ctx.fillRect(-15, -1, 30, 1);
+                ctx.fillRect(-15, -15, 1, 15);
+                ctx.fillRect(14, -15, 1, 15);
+            }
+            else if (id == 104 || id == 106) { //CURVE 1 1X1, CURVE 3 1X1
+                ctx.fillStyle = road;
+                ctx.fillRect(-15, -15, 30, 15);
+                ctx.fillStyle = roadPlatform;
+                ctx.fillRect(-11, -11, 22, 11);
+                ctx.fillStyle = yellow;
+                ctx.fillRect(-15, -15, 30, 1);
+                ctx.fillRect(-15, -15, 1, 15);
+                ctx.fillRect(14, -15, 1, 15);
+            }
+            else if (id == 9 || id == 11) { //CURVE 1 2X2, CURVE 3 2X2
+                ctx.fillStyle = road;
+                ctx.fillRect(-15, -15, 30, 30);
+                ctx.fillStyle = roadPlatform;
+                ctx.fillRect(-11, -15, 22, 26);
+                ctx.fillStyle = yellow;
+                ctx.fillRect(-15, 14, 30, 1);
+                ctx.fillRect(-15, -15, 1, 30);
+                ctx.fillRect(14, -15, 1, 30);
+            }
+            else if (id == 111 || id == 113) { //CURVE 1 3X3, CURVE 3 3X3
+                ctx.fillStyle = road;
+                ctx.fillRect(-15, -30, 30, 45);
+                ctx.fillStyle = roadPlatform;
+                ctx.fillRect(-11, -26, 22, 41);
+                ctx.fillStyle = yellow;
+                ctx.fillRect(-15, -30, 30, 1);
+                ctx.fillRect(-15, -30, 1, 45);
+                ctx.fillRect(14, -30, 1, 45);
+            }
+            else if (id == 118 || id == 120) { //1X1 CURVE 1 NARROW, 1X1 CURVE 3 NARROW
+                ctx.fillStyle = road;
+                ctx.fillRect(0, -15, 15, 15);
+                ctx.fillStyle = roadPlatform;
+                ctx.fillRect(3, -12, 9, 12);
+                ctx.fillStyle = yellow;
+                ctx.fillRect(0, -15, 15, 1);
+                ctx.fillRect(0, -15, 1, 15);
+                ctx.fillRect(14, -15, 1, 15);
+            }
+            else if (id == 121 || id == 123) { //2X2 NARROW CURVE 1, 2X2 NARROW CURVE 3
+                ctx.fillStyle = road;
+                ctx.fillRect(0, -15, 15, 30);
+                ctx.fillStyle = roadPlatform;
+                ctx.fillRect(3, -12, 9, 27);
+                ctx.fillStyle = yellow;
+                ctx.fillRect(0, -15, 15, 1);
+                ctx.fillRect(0, -15, 1, 30);
+                ctx.fillRect(14, -15, 1, 30);
+            }
+            else if (id == 124 || id == 126) { //3X3 NARROW CURVE 1, 3X3 NARROW CURVE 3
+                ctx.fillStyle = road;
+                ctx.fillRect(0, -30, 15, 45);
+                ctx.fillStyle = roadPlatform;
+                ctx.fillRect(3, -27, 9, 42);
+                ctx.fillStyle = yellow;
+                ctx.fillRect(0, -30, 15, 1);
+                ctx.fillRect(0, -30, 1, 45);
+                ctx.fillRect(14, -30, 1, 45);
+            }
+            else if (id == 107 || id == 108) { //1X1 CURVE CORNER DOWN, 1X1 CURVE CORNER UP
+                ctx.fillStyle = road;
+                ctx.beginPath();
+                ctx.moveTo(-15, 0);
+                ctx.arc(-15, 0, 15, 0, Math.PI / 2);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = roadPlatform;
+                ctx.beginPath();
+                ctx.moveTo(-11, 4);
+                ctx.arc(-15, 0, 15, 0.27, Math.PI / 2 - 0.27);
+                ctx.closePath();
+                ctx.fill();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = yellow;
+                ctx.beginPath();
+                ctx.moveTo(-14.5, 15);
+                ctx.lineTo(-14.5, 0.5);
+                ctx.lineTo(0, 0.5);
+                ctx.stroke();
+            }
+            else if (id == 109 || id == 110) { //2X2 CURVE CORNER DOWN, 2X2 CURVE CORNER UP
+                ctx.rotate(Math.PI);
+                ctx.fillStyle = road;
+                ctx.beginPath();
+                ctx.moveTo(-15, -15);
+                ctx.arc(-15, -15, 30, 0, Math.PI / 2);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = roadPlatform;
+                ctx.beginPath();
+                ctx.moveTo(-11, -11);
+                ctx.arc(-15, -15, 30, 0.13, Math.PI / 2 - 0.13);
+                ctx.closePath();
+                ctx.fill();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = yellow;
+                ctx.beginPath();
+                ctx.moveTo(-14.5, 15);
+                ctx.lineTo(-14.5, -14.5);
+                ctx.lineTo(15, -14.5);
+                ctx.stroke();
+            }
+            else if (id == 114 || id == 115) { //3X3 CURVE CORNER DOWN, 3X3 CURVE CORNER UP
+                ctx.fillStyle = road;
+                ctx.beginPath();
+                ctx.moveTo(-15, -30);
+                ctx.arc(-15, -30, 45, 0, Math.PI / 2);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = roadPlatform;
+                ctx.beginPath();
+                ctx.moveTo(-11, -26);
+                ctx.arc(-15, -30, 45, 0.09, Math.PI / 2 - 0.09);
+                ctx.closePath();
+                ctx.fill();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = yellow;
+                ctx.beginPath();
+                ctx.moveTo(-14.5, 15);
+                ctx.lineTo(-14.5, -29.5);
+                ctx.lineTo(30, -29.5);
+                ctx.stroke();
             }
             else if (id == 72 || id == 117) { //VERTICAL SHORT 2, VERTICAL 1X1
                 ctx.fillStyle = road;
@@ -473,7 +611,7 @@ buildPoolSet() {
                 ctx.arc(30, -30, 45, Math.PI / 2, Math.PI);
                 ctx.stroke();
             }
-            else if (id == 118 || id == 120 || id == 116 || id == 145) { //1X1 CURVE 1 NARROW, 1X1 CURVE 3 NARROW, 1X1 METAL PLATFORM, GRASS RAMP 1X1
+            else if (id == 116) { //1X1 METAL PLATFORM
                 ctx.fillStyle = road; ctx.fillRect(0, -15, 15, 15);
                 ctx.fillStyle = roadPlatform; ctx.fillRect(2.5, -12.5, 10, 10);
             } 
@@ -492,25 +630,7 @@ buildPoolSet() {
                 ctx.fillRect(-15, -15, 1, 15);
                 ctx.fillRect(-15, -1, 15, 1);
             }
-            else if (id == 107 || id == 108) { //1X1 CURVE CORNER UP, 1X1 CURVE CORNER DOWN
-                ctx.fillStyle = road;
-                ctx.beginPath();
-                ctx.moveTo(-15, 0);
-                ctx.arc(-15, 0, 15, 0, Math.PI / 2);
-                ctx.closePath();
-                ctx.fill();
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = platformEdge;
-                ctx.beginPath();
-                ctx.arc(-15, 0, 13.5, 0, Math.PI / 2);
-                ctx.stroke();
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = yellow;
-                ctx.beginPath();
-                ctx.arc(-15, 0, 14.5, 0, Math.PI / 2);
-                ctx.stroke();
-            }
-            else if (id == 109 || id == 110 || id == 151) { //2X2 CURVE CORNER DOWN, 2X2 CURVE CORNER UP, GRASS RAMP OUTER CORNER BIG
+            else if (id == 151) { //GRASS RAMP OUTER CORNER BIG
                 ctx.rotate(Math.PI);
                 ctx.fillStyle = road;
                 ctx.beginPath();
@@ -529,35 +649,7 @@ buildPoolSet() {
                 ctx.arc(-15, -15, 29.5, 0, Math.PI / 2);
                 ctx.stroke();
             }
-            else if (id == 114 || id == 115) { //3X3 CURVE CORNER DOWN, 3X3 CURVE CORNER UP
-                ctx.fillStyle = road;
-                ctx.beginPath();
-                ctx.moveTo(-15, -30);
-                ctx.arc(-15, -30, 45, 0, Math.PI / 2);
-                ctx.closePath();
-                ctx.fill();
-                ctx.lineWidth = 4;
-                ctx.strokeStyle = platformEdge;
-                ctx.beginPath();
-                ctx.arc(-15, -30, 43, 0, Math.PI / 2);
-                ctx.stroke();
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = yellow;
-                ctx.beginPath();
-                ctx.arc(-15, -30, 44.5, 0, Math.PI / 2);
-                ctx.stroke();
-            }
-            else if (id == 111 || id == 113) { //3X3 CURVE 1, CURVE 3
-                ctx.fillStyle = road;
-                ctx.fillRect(-15, -30, 30, 45);
-                ctx.fillStyle = platformEdge;
-                ctx.fillRect(-15, -30, 30, 4);
-                ctx.fillRect(-15, 11, 30, 4);
-                ctx.fillStyle = yellow;
-                ctx.fillRect(-15, -30, 30, 1);
-                ctx.fillRect(-15, 14, 30, 1);
-            }
-            else if (id == 124 || id == 126 || id == 127 || id == 129) { //3X3 NARROW CURVE 1, 3X3 NARROW CURVE 3, 3X3 NARROW SLOPE START, 3X3 SLOPE END
+            else if (id == 127 || id == 129) { //NARROW SLOPE START, NARROW SLOPE END
                 ctx.fillStyle = road;
                 ctx.fillRect(0, -30, 15, 45);
                 ctx.fillStyle = platformEdge;
@@ -567,7 +659,7 @@ buildPoolSet() {
                 ctx.fillRect(0, -30, 15, 1);
                 ctx.fillRect(0, 14, 15, 1);
             }
-            else if (id == 121 || id == 123 || id == 128 || id == 150) { //2X2 NARROW CURVE 1, 2X2 NARROW CURVE 3, 2X1 NARROW SLOPE, GRASS RAMP BIG NARROW
+            else if (id == 128) { //NARROW SLOPE
                 ctx.fillStyle = road;
                 ctx.fillRect(0, -15, 15, 30);
                 ctx.fillStyle = platformEdge;
@@ -616,31 +708,76 @@ buildPoolSet() {
                 if (id == 154) ctx.fillRect(-15, -15, 30, 4);
                 else ctx.fillRect(-15, 11, 30, 4);
             }
-            else if (id == 147) { //GRASS RAMP INNER CORNER SMALL
+            else if (id == 149) { //GRASS RAMP BIG
                 ctx.rotate(Math.PI)
+                ctx.fillStyle = road; 
+                ctx.fillRect(-15, -15, 30, 30);
+                ctx.fillStyle = platformEdge; 
+                ctx.fillRect(-15, -15, 4, 30);
+                ctx.fillRect(11, -15, 4, 30); 
+                ctx.fillRect(-15, 11, 30, 4);
+                ctx.fillStyle = yellow; 
+                ctx.fillRect(-15, -15, 1, 30);
+                ctx.fillRect(14, -15, 1, 30); 
+                ctx.fillRect(-15, 14, 30, 1);
+            }
+            else if (id == 43) { //GRASS RAMP
+                ctx.fillStyle = road; 
+                ctx.fillRect(-15, -15, 30, 15);
+                ctx.fillStyle = platformEdge; 
+                ctx.fillRect(-15, -15, 4, 15);
+                ctx.fillRect(11, -15, 4, 15); 
+                ctx.fillRect(-15, -15, 30, 4);
+                ctx.fillStyle = yellow;
+                ctx.fillRect(-15, -15, 1, 15); 
+                ctx.fillRect(14, -15, 1, 15);
+                ctx.fillRect(-15, -15, 30, 1);
+            }
+            else if (id == 145) { //GRASS RAMP 1X1
+                ctx.fillStyle = road; 
+                ctx.fillRect(0, -15, 15, 15);
+                ctx.fillStyle = platformEdge;
+                ctx.fillRect(0, -15, 15, 4);
+                ctx.fillRect(0, -15, 4, 15);
+                ctx.fillRect(11, -15, 4, 15);
+                ctx.fillStyle = yellow;
+                ctx.fillRect(0, -15, 15, 1);
+                ctx.fillRect(0, -15, 1, 15);
+                ctx.fillRect(14, -15, 1, 15);
+            }
+            else if (id == 150) { //GRASS RAMP BIG NARROW
+                ctx.fillStyle = road;
+                ctx.fillRect(0, -15, 15, 30);
+                ctx.fillStyle = platformEdge;
+                ctx.fillRect(0, -15, 15, 4);
+                ctx.fillRect(0, -15, 4, 30);
+                ctx.fillRect(11, -15, 4, 30);
+                ctx.fillStyle = yellow;
+                ctx.fillRect(0, -15, 15, 1);
+                ctx.fillRect(0, -15, 1, 30);
+                ctx.fillRect(14, -15, 1, 30);
+            }
+            else if (id == 147) { //GRASS RAMP INNER CORNER SMALL
+                ctx.rotate(Math.PI);
                 ctx.fillStyle = road;
                 ctx.fillRect(-15, 0, 15, 15);
-                ctx.fillStyle = border;
-                ctx.fillRect(-15, 13.5, 15, 1.5);
+                ctx.fillStyle = platformEdge;
+                ctx.fillRect(-15, 11, 15, 4);
                 ctx.fillStyle = yellow;
+                ctx.fillRect(-15, 14, 15, 1);
+                ctx.strokeStyle = platformEdge;
+                ctx.lineWidth = 4;
                 ctx.beginPath();
-                ctx.moveTo(-13.5, 0);
-                ctx.lineTo(0, 0);
-                ctx.lineTo(0, 13.5);
-                ctx.arc(0, 0, 13.5, Math.PI / 2, Math.PI);
-                ctx.closePath();
-                ctx.fill();
-                ctx.fillStyle = roadPlatform;
+                ctx.arc(0, 0, 13, Math.PI / 2, Math.PI);
+                ctx.stroke();
+                ctx.strokeStyle = yellow;
+                ctx.lineWidth = 1;
                 ctx.beginPath();
-                ctx.moveTo(-12, 1.5);
-                ctx.lineTo(-1.5, 1.5);
-                ctx.lineTo(-1.5, 12);
-                ctx.arc(0, 0, 12, Math.PI / 2, Math.PI);
-                ctx.closePath();
-                ctx.fill();
-                } 
+                ctx.arc(0, 0, 14.5, Math.PI / 2, Math.PI);
+                ctx.stroke();
+            }
             else if (id == 148) { //GRASS RAMP INNER CORNER LARGE
-                ctx.rotate(Math.PI)
+                ctx.rotate(Math.PI);
                 ctx.fillStyle = road;
                 ctx.beginPath();
                 ctx.moveTo(-15, -15);
@@ -650,20 +787,38 @@ buildPoolSet() {
                 ctx.lineTo(-15, 15);
                 ctx.closePath();
                 ctx.fill();
-                ctx.fillStyle = border;
-                ctx.fillRect(-15, 13.5, 30, 1.5);
+                ctx.fillStyle = platformEdge;
+                ctx.fillRect(-15, 11, 30, 4);
                 ctx.fillStyle = yellow;
+                ctx.fillRect(-15, 14, 30, 1);
+                ctx.strokeStyle = platformEdge;
+                ctx.lineWidth = 4;
                 ctx.beginPath();
-                ctx.arc(15, -15, 30, Math.PI / 2, Math.PI);
-                ctx.arc(15, -15, 15, Math.PI, Math.PI / 2, true);
-                ctx.closePath();
-                ctx.fill();
-                ctx.fillStyle = roadPlatform;
+                ctx.arc(15, -15, 17, Math.PI / 2, Math.PI);
+                ctx.stroke();
+                ctx.strokeStyle = yellow;
+                ctx.lineWidth = 1;
                 ctx.beginPath();
-                ctx.arc(15, -15, 28, Math.PI / 2 + 0.06, Math.PI - 0.06);
-                ctx.arc(15, -15, 17, Math.PI - 0.06, Math.PI / 2 + 0.06, true);
-                ctx.closePath();
-                ctx.fill();
+                ctx.arc(15, -15, 15.5, Math.PI / 2, Math.PI);
+                ctx.stroke();
+            }
+            else if (id == 152) { //GRASS RAMP BIG INNER CORNER
+                ctx.fillStyle = road;
+                ctx.fillRect(-15, -15, 30, 30);
+                ctx.fillStyle = platformEdge;
+                ctx.fillRect(-15, 11, 30, 4);
+                ctx.fillStyle = yellow;
+                ctx.fillRect(-15, 14, 30, 1);
+                ctx.strokeStyle = platformEdge;
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(15, -15, 28, Math.PI / 2, Math.PI);
+                ctx.stroke();
+                ctx.strokeStyle = yellow;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(15, -15, 29.5, Math.PI / 2, Math.PI);
+                ctx.stroke();
             }
             else if (id == 158) { //ICE
                 ctx.fillStyle = ice;
@@ -675,28 +830,6 @@ buildPoolSet() {
             }
             else if (id == 153 || id == 157) { //WATER POOL ROUNDED, WATER POOL SQUARE
                 this.drawPoolPiece(p, id == 153);
-            }
-            else if (id == 152) { //GRASS RAMP BIG INNER CORNER
-                ctx.fillStyle = road;
-                ctx.fillRect(-15, -15, 30, 30);
-                ctx.fillStyle = border;
-                ctx.fillRect(-15, 13.5, 30, 1.5);
-                ctx.fillStyle = yellow;
-                ctx.beginPath();
-                ctx.moveTo(-15, -15);
-                ctx.lineTo(15, -15);
-                ctx.lineTo(15, 13.5);
-                ctx.arc(15, -15, 28.5, Math.PI / 2, Math.PI);
-                ctx.closePath();
-                ctx.fill();
-                ctx.fillStyle = roadPlatform;
-                ctx.beginPath();
-                ctx.moveTo(-12, -13.5);
-                ctx.lineTo(13.5, -13.5);
-                ctx.lineTo(13.5, 12);
-                ctx.arc(15, -15, 27, Math.PI / 2, Math.PI);
-                ctx.closePath();
-                ctx.fill();
             }
             else if (id == 156) { //XL TURN
                 ctx.fillStyle = road;
@@ -829,10 +962,26 @@ buildPoolSet() {
     let readyInterval = null;
     let lastPos = { x: 0, z: 0, r: 0 };
     window.addEventListener("message", (e) => {
-        if (e.data.type === 'TRACK_DATA') {
-            isRaceActive = true;
+        if (e.data.type === 'RACE_START') {
+            pendingRaceStart = true;
             isManuallyClosed = false;
+            if (mapInstance && mapInstance.trackPieces.length > 0) {
+                isRaceActive = true;
+                pendingRaceStart = false;
+                ensureUI();
+                mapInstance.render(lastPos.x, lastPos.z, lastPos.r);
+            }
+        }
+        if (e.data.type === 'RACE_END') {
+            isRaceActive = false;
+            pendingRaceStart = false;
+            if (mapInstance) {
+                mapInstance.trackPieces = [];
+            }
             ensureUI();
+        }
+        if (e.data.type === 'TRACK_DATA') {
+            isManuallyClosed = false;
             if (mapInstance) {
                 let pieces = e.data.data.trackPieces || [];
                 if (e.data.data.editorVersion === 2) {
@@ -859,7 +1008,15 @@ buildPoolSet() {
                     lastPos = { x: 0, z: 0, r: 0 };
                 }
                 mapInstance.rebuildStaticLayer();
-                mapInstance.render(lastPos.x, lastPos.z, lastPos.r); 
+                if (pendingRaceStart && pieces.length > 0) {
+                    isRaceActive = true;
+                    pendingRaceStart = false;
+                    ensureUI();
+                    mapInstance.render(lastPos.x, lastPos.z, lastPos.r);
+                } else {
+                    isRaceActive = false;
+                    ensureUI();
+                }
             }
         }
         if (e.data.type === 'ADD_GHOST') {
@@ -884,8 +1041,14 @@ buildPoolSet() {
         if (e.data.type === 'UPDATE_POS') {
             if (Number.isFinite(e.data.x) && Number.isFinite(e.data.z)) {
                 lastPos = { x: e.data.x, z: e.data.z, r: Number.isFinite(e.data.r) ? e.data.r : lastPos.r };
-                if (mapInstance && isRaceActive && !isManuallyClosed) {
-                    mapInstance.render(lastPos.x, lastPos.z, lastPos.r);
+                if (mapInstance && mapInstance.trackPieces.length > 0) {
+                    if (!isRaceActive) {
+                        isRaceActive = true;
+                        ensureUI();
+                    }
+                    if (!isManuallyClosed) {
+                        mapInstance.render(lastPos.x, lastPos.z, lastPos.r);
+                    }
                 }
             }
         }
@@ -895,10 +1058,12 @@ buildPoolSet() {
             window.postMessage({ type: 'READY' }, "*");
         }
     }, 1000);
+    window.addEventListener('popstate', ensureUI);
+    window.addEventListener('hashchange', ensureUI);
     setInterval(() => {
         ensureUI();
         if (isRaceActive && !isManuallyClosed && mapInstance) {
             mapInstance.render(lastPos.x, lastPos.z, lastPos.r);
         }
-    }, 1000);
+    }, 200);
 })();
