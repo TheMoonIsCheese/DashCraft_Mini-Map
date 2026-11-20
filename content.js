@@ -980,6 +980,18 @@
         }
         if (e.data.type === 'TRACK_DATA') {
             isManuallyClosed = false;
+            ensureUI();
+            const container = document.getElementById('dashmap-container');
+            if (container) {
+                const envId = e.data.data.environment_ID ?? e.data.data.environmentId;
+                if (envId === 0 || envId === 1) {
+                    container.style.background = 'rgba(34, 139, 34, 0.7)';
+                } else if (envId === 2) {
+                    container.style.background = 'rgba(34, 161, 227, 0.7)';
+                } else {
+                    container.style.background = 'rgba(0, 0, 0, 0.7)';
+                }
+            }
             if (mapInstance) {
                 let pieces = e.data.data.trackPieces || [];
                 if (e.data.data.editorVersion === 2) {
