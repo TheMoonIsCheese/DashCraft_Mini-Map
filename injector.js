@@ -7,11 +7,15 @@
     let gameCamera = null;
     let playerCar = null;
     let prevPositions = new WeakMap();
+    let ghostTrails = []; 
+    let liveGhosts = [];
     function resetTrackerState() {
         allScenes.clear();
         gameScene = null;
         gameCamera = null;
         playerCar = null;
+        ghostTrails = []; 
+        liveGhosts = [];
         prevPositions = new WeakMap();
         topGhostUserIds.clear();
         wasInRace = false;
@@ -192,6 +196,42 @@
         }
         return topLevelGroups >= 2;
     }
+    function clearGhosts() {
+        ghostTrails = [];
+        liveGhosts = [];
+    }
+    function updateGhosts(scene) {
+        liveGhosts = [];
+        const ghostContainer = scene?.children?.[8];
+        if (!ghostContainer || ghostContainer.children.length === 0) return;
+        for (let i = 0; i < ghostContainer.children.length; i++) {
+            const ghostRoot = ghostContainer.children[i];
+            const body = ghostRoot?.children?.[0];
+            if (!body) continue;
+            const e = body.matrixWorld.elements;
+            const wx = e[12];
+            const wz = e[14];
+            if (Math.abs(wx) < 0.01 && Math.abs(wz) < 0.01) continue;
+            if (!Number.isFinite(wx) || !Number.isFinite(wz)) continue;
+            const forwardX = -e[8];
+            const forwardZ = e[10];
+            const headingDeg = (Math.atan2(forwardX, forwardZ) * 180) / Math.PI;
+            const x = wx;
+            const z = -wz;
+            const r = Number.isFinite(headingDeg) ? headingDeg : 0;
+            liveGhosts.push({ index: i, x, z, r });
+            if (!ghostTrails[i]) ghostTrails[i] = [];
+            const trail = ghostTrails[i];
+            const last = trail[trail.length - 1];
+            if (last && Math.hypot(x - last.x, z - last.z) > 30) {
+                ghostTrails = [];
+                return;
+            }
+            if ((x !== 0 || z !== 0) && (!last || Math.hypot(x - last.x, z - last.z) >= 2.5)) {
+                trail.push({ x, z });
+            }
+        }
+    }
     let lastSendTime = 0;
     let wasInRace = false;
     function updateLoop(now) {
@@ -201,20 +241,25 @@
             const transform = raceSceneActive ? getThreePlayerTransform() : null;
             const inRace = Boolean(raceSceneActive && transform && playerCar);
             if (inRace && !wasInRace) {
+                clearGhosts();
                 wasInRace = true;
                 window.postMessage({ type: 'RACE_START' }, "*");
             } else if (!raceSceneActive && wasInRace) {
+                clearGhosts();
                 wasInRace = false;
                 playerCar = null;
                 cachedTrackData = null;
                 window.postMessage({ type: 'RACE_END' }, "*");
             }
             if (inRace) {
+                updateGhosts(gameScene);
                 window.postMessage({
                     type: 'UPDATE_POS',
                     x: transform.x,
                     z: transform.z,
-                    r: transform.r
+                    r: transform.r,
+                    liveGhosts,
+                    ghostTrails
                 }, "*");
             }
         }
