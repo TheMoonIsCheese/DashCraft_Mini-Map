@@ -2,6 +2,7 @@
     let mapInstance = null;
     let isRaceActive = false;
     let ghostTrails = [];
+    let liveGhosts = [];
     let pendingRaceStart = false;
     let isManuallyClosed = false;
     class DashMinimap {
@@ -18,6 +19,45 @@
             this.staticCanvas.height = 1500;
             this.staticCtx = this.staticCanvas.getContext('2d');
         }
+        drawGhosts() {
+            const ctx = this.ctx;
+            const GHOST_COLORS = ['#00ffff', '#ff00ff', '#ffff00'];
+            for (let i = 0; i < ghostTrails.length; i++) {
+                const trail = ghostTrails[i];
+                if (!trail || trail.length < 2) continue;
+                ctx.save();
+                ctx.strokeStyle = GHOST_COLORS[i % GHOST_COLORS.length];
+                ctx.lineWidth = 4;
+                ctx.globalAlpha = 0.55;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                ctx.moveTo(750 + trail[0].x, 750 - trail[0].z);
+                for (let j = 1; j < trail.length; j++) {
+                    ctx.lineTo(750 + trail[j].x, 750 - trail[j].z);
+                }
+                ctx.stroke();
+                ctx.restore();
+            }
+            for (const g of liveGhosts) {
+                ctx.save();
+                ctx.translate(750 + g.x, 750 - g.z);
+                ctx.rotate((g.r || 0) * Math.PI / 180);
+                ctx.fillStyle = GHOST_COLORS[g.index % GHOST_COLORS.length];
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2.5;
+                ctx.globalAlpha = 0.85;
+                ctx.beginPath();
+                ctx.moveTo(0, -20);
+                ctx.lineTo(14, 13);
+                ctx.lineTo(0, 6);
+                ctx.lineTo(-14, 13);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
         sineWave(x, y, width, height, invert) {
             const ctx = this.ctx;
             ctx.moveTo(x, y);
@@ -30,7 +70,7 @@
                 }
             }
         }
-buildPoolSet() {
+        buildPoolSet() {
             this.poolSet.clear();
             for (const p of this.trackPieces) {
                 if (p.id === 153 || p.id === 157) {
@@ -869,27 +909,6 @@ buildPoolSet() {
                 this.drawPieceAtOrigin(p);
                 ctx.restore();
             });
-            this.ghosts.forEach((ghost, index) => {
-                const colors = ["#00ffff", "#ffff00", "#ff00ff"];
-                const color = colors[index % colors.length];
-                ctx.save();
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = color;
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 6;
-                ctx.lineCap = "round";
-                ctx.lineJoin = "round";
-                ctx.globalAlpha = 0.8;
-                ctx.beginPath();
-                ghost.points.forEach((point, i) => {
-                    const x = point.x;
-                    const z = -point.z;
-                    if (i === 0) ctx.moveTo(x, z);
-                    else ctx.lineTo(x, z);
-                });
-                ctx.stroke();
-                ctx.restore();
-            });
             ctx.restore();
             this.ctx = origCtx;
         }
@@ -898,6 +917,7 @@ buildPoolSet() {
             ctx.clearRect(0, 0, 1500, 1500);
             if (!this.trackPieces || this.trackPieces.length === 0) return;
             ctx.drawImage(this.staticCanvas, 0, 0);
+            this.drawGhosts();
             ctx.save();
             ctx.translate(750 + px, 750 - pz);
             ctx.rotate((pr || 0) * Math.PI / 180);
@@ -965,6 +985,8 @@ buildPoolSet() {
         if (e.data.type === 'RACE_START') {
             pendingRaceStart = true;
             isManuallyClosed = false;
+            ghostTrails = [];
+            liveGhosts = [];
             if (mapInstance && mapInstance.trackPieces.length > 0) {
                 isRaceActive = true;
                 pendingRaceStart = false;
@@ -975,6 +997,8 @@ buildPoolSet() {
         if (e.data.type === 'RACE_END') {
             isRaceActive = false;
             pendingRaceStart = false;
+            ghostTrails = [];
+            liveGhosts = [];
             if (mapInstance) {
                 mapInstance.trackPieces = [];
             }
@@ -984,6 +1008,8 @@ buildPoolSet() {
             isManuallyClosed = false;
             if (mapInstance) {
                 let pieces = e.data.data.trackPieces || [];
+                ghostTrails = []; 
+                liveGhosts = [];
                 if (e.data.data.editorVersion === 2) {
                     pieces = pieces.map(piece => {
                         const normR = (((piece.r || 0) % 360) + 360) % 360;
@@ -1007,6 +1033,12 @@ buildPoolSet() {
                 } else {
                     lastPos = { x: 0, z: 0, r: 0 };
                 }
+                ghostTrails = [];
+                liveGhosts = [
+                    { index: 0, x: lastPos.x, z: lastPos.z, r: lastPos.r },
+                    { index: 1, x: lastPos.x, z: lastPos.z, r: lastPos.r },
+                    { index: 2, x: lastPos.x, z: lastPos.z, r: lastPos.r }
+                ];
                 mapInstance.rebuildStaticLayer();
                 if (pendingRaceStart && pieces.length > 0) {
                     isRaceActive = true;
@@ -1039,6 +1071,8 @@ buildPoolSet() {
             }
         }
         if (e.data.type === 'UPDATE_POS') {
+            if (Array.isArray(e.data.liveGhosts)) liveGhosts = e.data.liveGhosts;
+            if (Array.isArray(e.data.ghostTrails)) ghostTrails = e.data.ghostTrails;
             if (Number.isFinite(e.data.x) && Number.isFinite(e.data.z)) {
                 lastPos = { x: e.data.x, z: e.data.z, r: Number.isFinite(e.data.r) ? e.data.r : lastPos.r };
                 if (mapInstance && mapInstance.trackPieces.length > 0) {
