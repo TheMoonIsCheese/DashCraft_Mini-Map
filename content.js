@@ -985,9 +985,9 @@
             if (container) {
                 const envId = e.data.data.environment_ID ?? e.data.data.environmentId;
                 if (envId === 0 || envId === 1) {
-                    container.style.background = 'rgba(34, 139, 34, 0.7)';
+                    container.style.background = 'rgba(14, 119, 14, 0.7)';
                 } else if (envId === 2) {
-                    container.style.background = 'rgba(34, 161, 227, 0.7)';
+                    container.style.background = 'rgba(14, 141, 207, 0.7)';
                 } else {
                     container.style.background = 'rgba(0, 0, 0, 0.7)';
                 }
