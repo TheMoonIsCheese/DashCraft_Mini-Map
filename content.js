@@ -70,60 +70,31 @@
                 }
             }
         }
-        buildPoolSet() {
-            this.poolSet.clear();
-            for (const p of this.trackPieces) {
-                if (p.id === 153 || p.id === 157) {
-                    this.poolSet.add(`${Math.round(p.p[0])},${Math.round(p.p[1])},${Math.round(p.p[2])}`);
-                }
-            }
-        }
-        drawPoolPiece(p, isRounded) {
+        drawPoolGroup(poolPieces) {
             const ctx = this.ctx;
-            const [x, y, z] = p.p;
-            const step = 30;
-            const worldN = this.poolSet.has(`${Math.round(x)},${Math.round(y)},${Math.round(z + step)}`);
-            const worldS = this.poolSet.has(`${Math.round(x)},${Math.round(y)},${Math.round(z - step)}`);
-            const worldW = this.poolSet.has(`${Math.round(x - step)},${Math.round(y)},${Math.round(z)}`);
-            const worldE = this.poolSet.has(`${Math.round(x + step)},${Math.round(y)},${Math.round(z)}`);
-            const rot = (((p.r || 0) % 360) + 360) % 360;
-            let hasTop = worldN, hasRight = worldE, hasBottom = worldS, hasLeft = worldW;
-            if (rot === 90) {
-                hasTop = worldW; hasRight = worldN; hasBottom = worldE; hasLeft = worldS;
-            } else if (rot === 180) {
-                hasTop = worldS; hasRight = worldW; hasBottom = worldN; hasLeft = worldE;
-            } else if (rot === 270) {
-                hasTop = worldE; hasRight = worldS; hasBottom = worldW; hasLeft = worldN;
-            }
             const size = 30;
             const half = 15;
-            const r = isRounded ? 6 : 0;
-            const radii = [
-                (!hasTop && !hasLeft) ? r : 0,
-                (!hasTop && !hasRight) ? r : 0,
-                (!hasBottom && !hasRight) ? r : 0,
-                (!hasBottom && !hasLeft) ? r : 0
-            ];
-            ctx.fillStyle = "#ffffff";
-            ctx.beginPath();
-            ctx.roundRect(-half, -half, size, size, radii);
-            ctx.fill();
             const b = 3;
-            const insetL = hasLeft ? 0 : b;
-            const insetR = hasRight ? 0 : b;
-            const insetT = hasTop ? 0 : b;
-            const insetB = hasBottom ? 0 : b;
-            const innerRadii = radii.map(rad => Math.max(0, rad - 2));
+            ctx.fillStyle = "#ffffff";
+            for (const p of poolPieces) {
+                ctx.save();
+                ctx.translate(p.p[0], -p.p[2]);
+                ctx.rotate((p.r || 0) * Math.PI / 180);
+                ctx.beginPath();
+                ctx.roundRect(-half - b, -half - b, size + b * 2, size + b * 2, p.id === 153 ? 8 : 0);
+                ctx.fill();
+                ctx.restore();
+            }
             ctx.fillStyle = "#22a1e3";
-            ctx.beginPath();
-            ctx.roundRect(
-                -half + insetL,
-                -half + insetT,
-                size - insetL - insetR,
-                size - insetT - insetB,
-                innerRadii
-            );
-            ctx.fill();
+            for (const p of poolPieces) {
+                ctx.save();
+                ctx.translate(p.p[0], -p.p[2]);
+                ctx.rotate((p.r || 0) * Math.PI / 180);
+                ctx.beginPath();
+                ctx.roundRect(-half, -half, size, size, p.id === 153 ? 5 : 0);
+                ctx.fill();
+                ctx.restore();
+            }
         }
         drawPieceAtOrigin(p) {
             const ctx = this.ctx;
@@ -869,7 +840,7 @@
                 ctx.fillRect(-15, -15, 30, 30);
             }
             else if (id == 153 || id == 157) { //WATER POOL ROUNDED, WATER POOL SQUARE
-                this.drawPoolPiece(p, id == 153);
+                return;
             }
             else if (id == 156) { //XL TURN
                 ctx.fillStyle = road;
@@ -898,10 +869,13 @@
                 this.ctx = origCtx;
                 return;
             }
-            this.buildPoolSet();
             const sortedPieces = [...this.trackPieces].sort((a, b) => a.p[1] - b.p[1]);
+            const poolPieces = sortedPieces.filter(p => p.id === 153 || p.id === 157);
             ctx.save();
             ctx.translate(750, 750);
+            if (poolPieces.length > 0) {
+                this.drawPoolGroup(poolPieces);
+            }
             sortedPieces.forEach(p => {
                 ctx.save();
                 ctx.translate(p.p[0], -p.p[2]);
@@ -1008,8 +982,6 @@
             isManuallyClosed = false;
             if (mapInstance) {
                 let pieces = e.data.data.trackPieces || [];
-                ghostTrails = []; 
-                liveGhosts = [];
                 if (e.data.data.editorVersion === 2) {
                     pieces = pieces.map(piece => {
                         const normR = (((piece.r || 0) % 360) + 360) % 360;
@@ -1022,7 +994,8 @@
                     });
                 }
                 mapInstance.trackPieces = pieces;
-                mapInstance.ghosts = [];
+                ghostTrails = [];
+                liveGhosts = [];
                 const startPiece = pieces.find(p => p.id === 1);
                 if (startPiece) {
                     lastPos = {
@@ -1033,12 +1006,6 @@
                 } else {
                     lastPos = { x: 0, z: 0, r: 0 };
                 }
-                ghostTrails = [];
-                liveGhosts = [
-                    { index: 0, x: lastPos.x, z: lastPos.z, r: lastPos.r },
-                    { index: 1, x: lastPos.x, z: lastPos.z, r: lastPos.r },
-                    { index: 2, x: lastPos.x, z: lastPos.z, r: lastPos.r }
-                ];
                 mapInstance.rebuildStaticLayer();
                 if (pendingRaceStart && pieces.length > 0) {
                     isRaceActive = true;
