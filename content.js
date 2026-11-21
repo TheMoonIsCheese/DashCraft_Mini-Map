@@ -149,25 +149,29 @@
                 ctx.arc(15, 15, 30, Math.PI, Math.PI / 2 * 3);
                 ctx.lineTo(15, 15);
                 ctx.fill();
+                ctx.lineWidth = 4;
                 ctx.fillStyle = border;
-                ctx.beginPath(); ctx.arc(15, 15, 4, Math.PI, Math.PI / 2 * 3); ctx.lineTo(15, 15); ctx.fill();
+                ctx.beginPath(); ctx.arc(15, 15, 2, Math.PI, Math.PI / 2 * 3); ctx.lineTo(15, 15); ctx.stroke();
                 ctx.beginPath(); ctx.arc(15, 15, 28, Math.PI, Math.PI / 2 * 3); ctx.stroke();
                 ctx.strokeStyle = yellow;
                 ctx.beginPath(); ctx.arc(15, 15, 6, Math.PI, Math.PI / 2 * 3); ctx.stroke();
                 ctx.beginPath(); ctx.arc(15, 15, 24, Math.PI, Math.PI / 2 * 3); ctx.stroke();
+                ctx.lineWidth = 1;
             }
-            else if (id == 6 || id == 57 || id == 58) { //MEDIUM TURN, MEDIUM BANKED TURN, RIGHT SLOPE MEDIUM
+            else if (id == 6 || id == 57 || id == 58) {
                 ctx.fillStyle = road;
                 ctx.beginPath();
                 ctx.arc(30, 30, 60, Math.PI, Math.PI / 2 * 3);
                 ctx.arc(30, 30, 30, Math.PI / 2 * 3, Math.PI, true);
                 ctx.fill();
-                ctx.fillStyle = border;
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = border;
                 ctx.beginPath(); ctx.arc(30, 30, 58, Math.PI, Math.PI / 2 * 3); ctx.stroke();
                 ctx.beginPath(); ctx.arc(30, 30, 32, Math.PI, Math.PI / 2 * 3); ctx.stroke();
                 ctx.strokeStyle = yellow;
                 ctx.beginPath(); ctx.arc(30, 30, 36, Math.PI, Math.PI / 2 * 3); ctx.stroke();
                 ctx.beginPath(); ctx.arc(30, 30, 54, Math.PI, Math.PI / 2 * 3); ctx.stroke();
+                ctx.lineWidth = 1;
             }
             else if (id == 8 || id == 52 || id == 53 || id == 75 || id == 62 || id == 79 || id == 77) { //LARGE TURN, BANKED LARGE TURN, RIGHT SLOPE LARGE, FLAT TO SLOPE RIGHT, TRANSITION TURN RIGHT, RIGHT SLOPE DOWN, RIGHT SLOPE UP
                 ctx.fillStyle = road;
@@ -175,12 +179,14 @@
                 ctx.arc(45, 45, 90, Math.PI, Math.PI / 2 * 3);
                 ctx.arc(45, 45, 60, Math.PI / 2 * 3, Math.PI, true);
                 ctx.fill();
-                ctx.fillStyle = border;
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = border;
                 ctx.beginPath(); ctx.arc(45, 45, 88, Math.PI, Math.PI / 2 * 3); ctx.stroke();
                 ctx.beginPath(); ctx.arc(45, 45, 62, Math.PI, Math.PI / 2 * 3); ctx.stroke();
                 ctx.strokeStyle = yellow;
                 ctx.beginPath(); ctx.arc(45, 45, 66, Math.PI, Math.PI / 2 * 3); ctx.stroke();
                 ctx.beginPath(); ctx.arc(45, 45, 84, Math.PI, Math.PI / 2 * 3); ctx.stroke();
+                ctx.lineWidth = 1;
             }
             else if (id == 130 || id == 144) { //SPECTATOR BOOTH, ROAD MIDDLE
                 ctx.fillStyle = road; ctx.fillRect(0, 0, 15, 15);
@@ -319,74 +325,101 @@
                 ctx.fillRect(-11, -15, 4, 15); ctx.fillRect(7, -15, 4, 15);
             }
             else if (id == 54 || id == 76 || id == 63 || id == 80 || id == 78) { //LEFT SLOPE LARGE, FLAT TO SLOPE LEFT, TRANSITION TURN LEFT, LEFT SLOPE DOWN, LEFT SLOPE UP
-                ctx.fillStyle = road; ctx.beginPath();
-                ctx.arc(-45, 45, 90, Math.PI / 2 * 3, 0); ctx.arc(-45, 45, 60, 0, Math.PI / 2 * 3, true); ctx.fill();
-                ctx.fillStyle = border; ctx.beginPath(); ctx.arc(-45, 45, 88, Math.PI / 2 * 3, 0); ctx.stroke();
-                ctx.beginPath(); ctx.arc(-45, 45, 62, Math.PI / 2 * 3, 0); ctx.stroke();
-                ctx.strokeStyle = yellow; ctx.beginPath(); ctx.arc(-45, 45, 66, Math.PI / 2 * 3, 0); ctx.stroke();
-                ctx.beginPath(); ctx.arc(-45, 45, 84, Math.PI / 2 * 3, 0); ctx.stroke();
+                ctx.fillStyle = road; 
+                ctx.beginPath();
+                ctx.arc(-45, 45, 90, Math.PI / 2 * 3, 0); 
+                ctx.arc(-45, 45, 60, 0, Math.PI / 2 * 3, true); 
+                ctx.fill();
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = border;
+                ctx.beginPath(); 
+                ctx.arc(-45, 45, 88, Math.PI / 2 * 3, 0); 
+                ctx.stroke();
+                ctx.beginPath(); 
+                ctx.arc(-45, 45, 62, Math.PI / 2 * 3, 0); 
+                ctx.stroke();
+                ctx.strokeStyle = yellow; 
+                ctx.beginPath(); 
+                ctx.arc(-45, 45, 66, Math.PI / 2 * 3, 0); 
+                ctx.stroke();
+                ctx.beginPath(); 
+                ctx.arc(-45, 45, 84, Math.PI / 2 * 3, 0); 
+                ctx.stroke();
+                ctx.lineWidth = 1;
             }
             else if (id == 59) { //LEFT SLOPE UP MEDIUM
                 ctx.fillStyle = road; ctx.beginPath();
-                ctx.arc(-30, 30, 60, Math.PI / 2 * 3, 0); ctx.arc(-30, 30, 30, 0, Math.PI / 2 * 3, true); ctx.fill();
+                ctx.arc(-30, 30, 60, Math.PI / 2 * 3, 0); ctx.arc(-30, 30, 30, 0, Math.PI / 2 * 3, true); ctx.fill(); ctx.lineWidth = 4;
                 ctx.fillStyle = border; ctx.beginPath(); ctx.arc(-30, 30, 58, Math.PI / 2 * 3, 0); ctx.stroke();
                 ctx.beginPath(); ctx.arc(-30, 30, 32, Math.PI / 2 * 3, 0); ctx.stroke();
                 ctx.strokeStyle = yellow; ctx.beginPath(); ctx.arc(-30, 30, 36, Math.PI / 2 * 3, 0); ctx.stroke();
-                ctx.beginPath(); ctx.arc(-30, 30, 54, Math.PI / 2 * 3, 0); ctx.stroke();
+                ctx.beginPath(); ctx.arc(-30, 30, 54, Math.PI / 2 * 3, 0); ctx.stroke(); ctx.lineWidth = 1;
             }
             else if (id == 64) { //SMALL SNAKE RIGHT
                 ctx.fillStyle = road; ctx.beginPath();
                 this.sineWave(-15, 15, 15, 30, true); ctx.lineTo(15, 15);
                 this.sineWave(15, 15, 15, 30, true); ctx.lineTo(0, -15); ctx.fill();
+                ctx.lineWidth = 4;
                 ctx.strokeStyle = border; ctx.beginPath(); this.sineWave(-13, 15, 15, 30, true); ctx.stroke();
                 ctx.beginPath(); this.sineWave(13, 15, 15, 30, true); ctx.stroke();
                 ctx.strokeStyle = yellow; ctx.beginPath(); this.sineWave(-9, 15, 15, 30, true); ctx.stroke();
                 ctx.beginPath(); this.sineWave(9, 15, 15, 30, true); ctx.stroke();
+                ctx.lineWidth = 1;
             }
             else if (id == 65) { //SMALL SNAKE LEFT
                 ctx.fillStyle = road; ctx.beginPath();
                 this.sineWave(-30, -15, 15, 30, false); ctx.lineTo(0, -15);
                 this.sineWave(0, -15, 15, 30, false); ctx.lineTo(-15, 15); ctx.fill();
+                ctx.lineWidth = 4;
                 ctx.strokeStyle = border; ctx.beginPath(); this.sineWave(-28, -15, 15, 30, false); ctx.stroke();
                 ctx.beginPath(); this.sineWave(-2, -15, 15, 30, false); ctx.stroke();
                 ctx.strokeStyle = yellow; ctx.beginPath(); this.sineWave(-24, -15, 15, 30, false); ctx.stroke();
                 ctx.beginPath(); this.sineWave(-6, -15, 15, 30, false); ctx.stroke();
+                ctx.lineWidth = 1;
             }
             else if (id == 66) { //MEDIUM SNAKE RIGHT
                 ctx.fillStyle = road; ctx.beginPath();
                 this.sineWave(-30, 30, 30, 60, true); ctx.lineTo(30, -30);
                 this.sineWave(0, 30, 30, 60, true); ctx.lineTo(-30, 30); ctx.fill();
+                ctx.lineWidth = 4;
                 ctx.strokeStyle = border; ctx.beginPath(); this.sineWave(-28, 30, 30, 60, true); ctx.stroke();
                 ctx.beginPath(); this.sineWave(-2, 30, 30, 60, true); ctx.stroke();
                 ctx.strokeStyle = yellow; ctx.beginPath(); this.sineWave(-24, 30, 30, 60, true); ctx.stroke();
                 ctx.beginPath(); this.sineWave(-6, 30, 30, 60, true); ctx.stroke();
+                ctx.lineWidth = 1;
             }
             else if (id == 67) { //MEDIUM SNAKE LEFT
                 ctx.fillStyle = road; ctx.beginPath();
                 this.sineWave(-30, -30, 30, 60, false); ctx.lineTo(30, 30);
                 this.sineWave(0, -30, 30, 60, false); ctx.lineTo(-30, -30); ctx.fill();
+                ctx.lineWidth = 4;
                 ctx.strokeStyle = border; ctx.beginPath(); this.sineWave(-28, -30, 30, 60, false); ctx.stroke();
                 ctx.beginPath(); this.sineWave(-2, -30, 30, 60, false); ctx.stroke();
                 ctx.strokeStyle = yellow; ctx.beginPath(); this.sineWave(-24, -30, 30, 60, false); ctx.stroke();
                 ctx.beginPath(); this.sineWave(-6, -30, 30, 60, false); ctx.stroke();
+                ctx.lineWidth = 1;
             }
             else if (id == 68) { //LARGE SNAKE RIGHT
                 ctx.fillStyle = road; ctx.beginPath();
                 this.sineWave(-45, 45, 60, 90, true); ctx.lineTo(45, -45);
                 this.sineWave(-15, 45, 60, 90, true); ctx.lineTo(-45, 45); ctx.fill();
+                ctx.lineWidth = 4;
                 ctx.strokeStyle = border; ctx.beginPath(); this.sineWave(-43, 45, 60, 90, true); ctx.stroke();
                 ctx.beginPath(); this.sineWave(-17, 45, 60, 90, true); ctx.stroke();
                 ctx.strokeStyle = yellow; ctx.beginPath(); this.sineWave(-39, 45, 60, 90, true); ctx.stroke();
                 ctx.beginPath(); this.sineWave(-21, 45, 60, 90, true); ctx.stroke();
+                ctx.lineWidth = 1;
             }
             else if (id == 69) { //LARGE SNAKE LEFT
                 ctx.fillStyle = road; ctx.beginPath();
                 this.sineWave(-45, -45, 60, 90, false); ctx.lineTo(45, 45);
                 this.sineWave(-15, -45, 60, 90, false); ctx.lineTo(-45, -45); ctx.fill();
+                ctx.lineWidth = 4;
                 ctx.strokeStyle = border; ctx.beginPath(); this.sineWave(-43, -45, 60, 90, false); ctx.stroke();
                 ctx.beginPath(); this.sineWave(-17, -45, 60, 90, false); ctx.stroke();
                 ctx.strokeStyle = yellow; ctx.beginPath(); this.sineWave(-39, -45, 60, 90, false); ctx.stroke();
                 ctx.beginPath(); this.sineWave(-21, -45, 60, 90, false); ctx.stroke();
+                ctx.lineWidth = 1;
             }
             else if (id == 70) { //HORIZONTAL SHORT METAL
                 ctx.fillStyle = road;
@@ -848,12 +881,14 @@
                 ctx.arc(-60, -60, 120, 0, Math.PI / 2);
                 ctx.arc(-60, -60, 90, Math.PI / 2, 0, true);
                 ctx.fill();
+                ctx.lineWidth = 4;
                 ctx.strokeStyle = border;
                 ctx.beginPath(); ctx.arc(-60, -60, 118, 0, Math.PI / 2); ctx.stroke();
                 ctx.beginPath(); ctx.arc(-60, -60, 92, 0, Math.PI / 2); ctx.stroke();
                 ctx.strokeStyle = yellow;
                 ctx.beginPath(); ctx.arc(-60, -60, 96, 0, Math.PI / 2); ctx.stroke();
                 ctx.beginPath(); ctx.arc(-60, -60, 114, 0, Math.PI / 2); ctx.stroke();
+                ctx.lineWidth = 1;
             }
             else { //FALLBACK
                 ctx.fillStyle = road;
