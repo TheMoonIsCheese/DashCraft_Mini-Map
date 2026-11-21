@@ -7,21 +7,24 @@ Real-Time Track Rendering: Automatically reads track data on load and renders an
 
 Live Player Tracker: Tracks your vehicle's live position and rotation in real time.
 
-Ghost Trail Display: Currently not working in remake as there is no endpoint for storing ghosts in the remake yet.
+Ghost Trail Display: Tracks the top 3 ghosts on any map and leaves behind a trail for you to follow.
 
 High-Contrast Visuals: Color-coded track surfaces, platform trims, and high-visibility player markers so you can read upcoming turns at a glance.
 
 ### Installation (Chrome / Edge / Brave)
 
-Download or clone this repository:
+Download this repository:
 
-```git clone https://github.com/TheMoonIsCheese/DashMap-Final.git```
+Press "Code" while on the main tab and click "Download ZIP".
+(Alternatively, run this command: ```git clone https://github.com/TheMoonIsCheese/DashCraft_Mini-Map.git```)
+
+If you downloaded the ZIP file, make sure to navigate to the file in your Files app and right click on it, then select "Extract All".
 
 Open your browser and navigate to ```chrome://extensions``` (or ```edge://extensions``` / ```brave://extensions```).
 
 Enable Developer mode using the toggle in the top-right corner.
 
-Click Load unpacked and select the folder containing manifest.json.
+Click Load unpacked and select the folder containing ```manifest.json```. This folder will likely be two folders deep due to GitHub's download structuring.
 
 Open DashCraft.io, load up any track, and the minimap will appear automatically!
 
@@ -39,5 +42,5 @@ Open DashCraft.io, load up any track, and the minimap will appear automatically!
 
 Author: [@TheMoonIsCheese](https://github.com/TheMoonIsCheese/)
 
-Special Thanks: [@Phantomlnfinity](https://github.com/Phantomlnfinity/) — Huge thanks for the foundational drawing logic and inspiration from [DashMap_Ripoff](https://github.com/Phantomlnfinity/DashMap_Ripoff).
+Special Thanks: [@Phantomlnfinity](https://github.com/Phantomlnfinity/) — Big thanks for the foundational drawing logic and inspiration from [DashMap_Ripoff](https://github.com/Phantomlnfinity/DashMap_Ripoff).
 
