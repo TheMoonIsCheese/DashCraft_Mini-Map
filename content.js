@@ -536,6 +536,8 @@
                 ctx.stroke();
             }
             else if (id == 114 || id == 115) { //3X3 CURVE CORNER DOWN, 3X3 CURVE CORNER UP
+                ctx.rotate(Math.PI)
+                ctx.translate(-15, 0)
                 ctx.fillStyle = road;
                 ctx.beginPath();
                 ctx.moveTo(-15, -30);
