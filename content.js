@@ -1081,14 +1081,13 @@
                     });
                 }
                 mapInstance.ghosts.sort((a, b) => a.finishTime - b.finishTime);
-                mapInstance.ghosts = mapInstance.ghosts.slice(0, 3);
                 mapInstance.rebuildStaticLayer();
                 mapInstance.render(lastPos.x, lastPos.z, lastPos.r); 
             }
         }
         if (e.data.type === 'UPDATE_POS') {
-            if (Array.isArray(e.data.liveGhosts)) liveGhosts = e.data.liveGhosts;
-            if (Array.isArray(e.data.ghostTrails)) ghostTrails = e.data.ghostTrails;
+            if (Array.isArray(e.data.liveGhosts)) liveGhosts = e.data.liveGhosts.slice(0, 3);
+            if (Array.isArray(e.data.ghostTrails)) ghostTrails = e.data.ghostTrails.slice(0, 3);
             if (Number.isFinite(e.data.x) && Number.isFinite(e.data.z)) {
                 lastPos = { x: e.data.x, z: e.data.z, r: Number.isFinite(e.data.r) ? e.data.r : lastPos.r };
                 if (mapInstance && mapInstance.trackPieces.length > 0) {
